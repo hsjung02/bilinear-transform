@@ -1,0 +1,153 @@
+0. 설명
+  s domain에서의 전달함수를 입력받아 discrete time domain으로 변환하는 함수 blt가 정의된 C2DLibrary
+
+1. 헤더 파일(.h) 및 lib 파일 include
+    #pragma comment(lib, "path") //path: C2DLibrary.lib 파일 경로
+    #include "path" //path: C2DLibrary.h 파일 경로
+
+2. 함수 프로토타입
+  void blt(int m, int n, double* a, double * b, double T, double** ret);
+  
+  m: 분모 차수
+  n: 분자 차수
+  a: 분모 계수열 ( 상수항부터 차례대로 ) -> 포인터로 넘겨줘야함
+  b: 분자 계수열 ( 상수항부터 차례대로 ) -> 포인터로 넘겨줘야함
+  T: 샘플링 주기
+  ret: time domain에서의 계수 ( 이차원 배열 포인터 )
+  ret[0]: 분자의 차수가 최고차항부터 있음
+  ret[1]: 분모의 차수가 최고차항부터 있음
+
+3. 사용법
+  (1) a, b 동적할당 및 초기화
+        a = (double*)malloc((int64_t)sizeof(double) * (int64_t)(m + 1));
+        for (int i = 0; i <= m; i++)scanf("%lf", a + i);
+        b = (double*)malloc((int64_t)sizeof(double) * (int64_t)(n + 1));
+        for (int i = 0; i <= n; i++)scanf("%lf", b + i);
+  (2) ret 동적할당
+        double** timedomain;
+        timedomain = (double**)malloc((int64_t)sizeof(double*) * (int64_t)2);
+        timedomain[0] = (double*)malloc((int64_t)sizeof(double) * (int64_t)(m + 1));
+        timedomain[1] = (double*)malloc((int64_t)sizeof(double) * (int64_t)(m + 1));
+  (3) blt 호출
+        blt(m, n, a, b, T, timedomain);
+  (4) a, b 할당해제
+        free(a);
+        free(b);
+        //free(timedomain[0]);
+        //free(timedomain[1]);
+        //free(timedomain);
+
+ 
+==각종 테스트케이스==
+
+Input
+분모 차수
+분모 계수 (상수항부터)
+분자 차수
+분자 계수 (상수항부터)
+샘플링 주기
+
+Output
+분자 최고차항부터 계수
+분모 최고차항부터 계수
+
+
+Input
+1
+2 3
+1
+7 4
+2
+
+Output
+11 3
+5 -1
+
+Input
+1
+2 3
+1
+7 4
+1
+
+Output
+15 -1
+8 -4
+
+Input
+1
+2 3
+1
+7 4
+0.667
+
+Output
+19 -5
+11 -7
+
+Input
+1
+0.9425 1
+1
+0 1
+2
+
+Output
+1 -1
+1 -0.1518
+
+Input
+1
+0.9425 1
+1
+0 1
+1
+
+Output
+1 -1
+1 -0.3897
+
+Input
+2
+7 3 1
+1
+1 2
+1
+
+Output
+3 2 -1
+11 12 5
+
+Input
+2
+7 3 1
+1
+1 2
+2
+
+Output
+5 2 -3
+17 6 5
+
+Input
+3
+1 1 1 1
+1
+1 2
+1
+
+Output
+3 5 1 -1
+4 0 4 0
+
+Input
+3
+1 1 1 1
+1
+1 2
+2
+
+Output
+5 7 -1 -3
+15 -23 21 -5
+
